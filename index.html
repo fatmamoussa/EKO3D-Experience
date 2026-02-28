@@ -306,13 +306,7 @@
         }
         .btn-fx:not(:disabled):hover { box-shadow: 0 0 20px rgba(0,255,136,.3); transform: translateY(-2px); }
 
-        .btn-share {
-            background: linear-gradient(135deg, rgba(138,43,226,.2), rgba(138,43,226,.08));
-            border: 1px solid rgba(138,43,226,.5);
-            color: #bf80ff;
-        }
-        .btn-share:not(:disabled):hover { transform: translateY(-2px); }
-
+        
         #danceLabel {
             text-align: center; margin-top: 10px;
             font-family: 'Orbitron', monospace; font-size: 10px;
@@ -543,10 +537,7 @@
             <span class="btn-icon">⏺</span>
             VIDEO
         </button>
-        <button class="btn btn-share" id="btnShare" disabled>
-            <span class="btn-icon">🔗</span>
-            SHARE
-        </button>
+       
     </div>
     <div id="danceLabel">POINTEZ L'IMAGE <span class="active">EKO</span> POUR DÉMARRER</div>
 </div>
@@ -590,73 +581,237 @@ import { MindARThree } from "mindar-image-three";
 // ---------------------------------------------------------------
 //  CATALOGUE DE DANSES
 // ---------------------------------------------------------------
+// ================================================================
+// CATALOGUE DE DANSES - Version Ultra-Distincte
+// Chaque danse a une signature visuelle unique et immédiate
+// ================================================================
 const DANSES = [
     {
-        id: 'SALUT',     icon: '👋', desc: 'Salutation',
-        color: '#00f5ff', speed: 1.5,
+        id: 'SALUT', icon: '🤝', desc: 'Salutation',
+        color: '#00f5ff',
         animate(av, t) {
-            av.rotation.y = Math.sin(t * 1.5) * 0.35;
-            av.position.y = 0.5 + Math.sin(t * 3.5) * 0.12;
-            av.rotation.z = Math.sin(t * 2) * 0.05;
+            // Mouvement de révérence : la mascotte s'incline
+            const bow = Math.abs(Math.sin(t * 2)) * 0.8; // 0 à 0.8
+            av.rotation.x = bow * 0.5; // S'incline vers l'avant
+            av.rotation.z = 0;
+            av.position.y = 0.6 - bow * 0.2; // Descend en s'inclinant
+            
+            // Bras qui s'ouvrent (simulé par les halos)
+            const hc = av.getObjectByName('haloCyan');
+            const hm = av.getObjectByName('haloMag');
+            if(hc) hc.scale.set(1.1 + bow*0.3, 1.4, 1);
+            if(hm) hm.scale.set(1.05 + bow*0.3, 1.3, 1);
         }
     },
     {
-        id: 'DISCO',     icon: '🕺', desc: 'Disco Fever',
-        color: '#ff0080', speed: 2,
+        id: 'DISCO', icon: '🪩', desc: 'Boule à facettes',
+        color: '#ff0080',
         animate(av, t) {
-            av.rotation.y += 0.04;
-            av.rotation.z = Math.sin(t * 6) * 0.22;
-            av.rotation.x = Math.sin(t * 4) * 0.12;
-            av.position.y = 0.5 + Math.abs(Math.sin(t * 8)) * 0.2;
+            // Rotation rapide sur tous les axes
+            av.rotation.y += 0.08;
+            av.rotation.x = Math.sin(t * 4) * 0.3;
+            av.rotation.z = Math.cos(t * 5) * 0.2;
+            
+            // Rebondissements
+            av.position.y = 0.5 + Math.abs(Math.sin(t * 6)) * 0.3;
+            
+            // Effet de boule disco : échelle qui pulse
+            const pulse = 0.55 + Math.sin(t * 8) * 0.1;
+            av.scale.set(pulse, pulse * 1.1, pulse);
+            
+            // Les cadres tournent en sens inverse pour effet disco
+            const frame = av.getObjectByName('frame');
+            const frame2 = av.getObjectByName('frame2');
+            if(frame) frame.rotation.y += 0.1;
+            if(frame2) frame2.rotation.y -= 0.15;
         }
     },
     {
-        id: 'HIPHOP',    icon: '🤸', desc: 'Hip-Hop',
-        color: '#ffd700', speed: 3,
+        id: 'BREAK', icon: '🤸', desc: 'Breakdance',
+        color: '#ffd700',
         animate(av, t) {
-            const b = Math.abs(Math.sin(t * 5));
-            av.position.y = 0.35 + b * 0.35;
-            av.rotation.z = Math.sin(t * 5) * 0.28;
-            av.rotation.y = (Math.floor(t * 2) % 4) * Math.PI * 0.5 * 0.3;
-            av.scale.y = 0.6 - b * 0.08;
-            av.scale.x = 0.6 + b * 0.08;
+            // Rotation au sol (break)
+            av.rotation.y += 0.1;
+            
+            // Mouvements au sol : la mascotte descend et remonte
+            const down = Math.abs(Math.sin(t * 3));
+            av.position.y = 0.2 + down * 0.4;
+            
+            // Rotation sur la tête (simulé par rotation X)
+            av.rotation.x = Math.sin(t * 2) * 1.5; // Rotation presque verticale
+            
+            // Mouvements saccadés
+            if(Math.sin(t * 10) > 0.7) {
+                av.position.x = Math.sin(t * 5) * 0.2;
+            }
+            
+            // Échelle qui se déforme (comme un mouvement au sol)
+            av.scale.y = 0.5 + down * 0.3;
+            av.scale.x = 0.6 - down * 0.2;
         }
     },
     {
-        id: 'WAVE',      icon: '🌊', desc: 'Robot Wave',
-        color: '#00ff88', speed: 1,
+        id: 'WAVE', icon: '🌊', desc: 'Vague robotique',
+        color: '#00ff88',
         animate(av, t) {
-            av.rotation.y = Math.sin(t * 1.8) * 0.45;
-            av.rotation.x = Math.sin(t * 2.2) * 0.15;
-            av.rotation.z = Math.cos(t * 1.5) * 0.2;
-            av.position.y = 0.5 + Math.sin(t * 2) * 0.15;
+            // Effet de vague qui parcourt la mascotte
+            const wavePos = (t * 2) % 1;
+            
+            // Les différentes parties bougent en cascade
+            const frame = av.getObjectByName('frame');
+            const frame2 = av.getObjectByName('frame2');
+            const ring = av.getObjectByName('ring');
+            const particles = av.getObjectByName('particles');
+            
+            // Vague sur les positions Y
+            av.position.y = 0.5 + Math.sin(t * 3) * 0.15;
+            
+            // Rotation en vague
+            av.rotation.z = Math.sin(t * 2.5) * 0.2;
+            av.rotation.x = Math.cos(t * 2.8) * 0.15;
+            
+            // Effet de propagation sur les cadres
+            if(frame) {
+                frame.position.y = 0.6 + Math.sin(t * 4) * 0.1;
+                frame.rotation.z = Math.sin(t * 3) * 0.1;
+            }
+            if(frame2) {
+                frame2.position.y = 0.6 + Math.cos(t * 4 + 1) * 0.1;
+                frame2.rotation.z = Math.cos(t * 3 + 1) * 0.1;
+            }
+            
+            // Particules en mouvement de vague
+            if(particles) {
+                particles.rotation.x += 0.01;
+                particles.rotation.z += 0.005;
+            }
         }
     },
     {
-        id: 'SPIN',      icon: '💫', desc: 'Tourbillon',
-        color: '#bf80ff', speed: 2.5,
+        id: 'SPIN', icon: '🌀', desc: 'Tourbillon fou',
+        color: '#bf80ff',
         animate(av, t) {
-            av.rotation.y += 0.055;
-            av.rotation.x = Math.sin(t * 1.2) * 0.2;
-            const sc = 0.6 + Math.sin(t * 3) * 0.12;
-            av.scale.setScalar(sc);
-            av.position.y = 0.5 + Math.sin(t * 2) * 0.1;
+            // Rotation ultra-rapide
+            av.rotation.y += 0.15;
+            av.rotation.x += 0.05;
+            av.rotation.z += 0.03;
+            
+            // La mascotte monte en tournant
+            av.position.y = 0.5 + Math.sin(t * 3) * 0.4;
+            
+            // Effet d'aspiration : échelle qui varie
+            const spiral = 0.4 + Math.abs(Math.sin(t * 4)) * 0.3;
+            av.scale.set(spiral, spiral * 1.2, spiral);
+            
+            // Les halos tournent autour
+            const hc = av.getObjectByName('haloCyan');
+            const hm = av.getObjectByName('haloMag');
+            if(hc) {
+                hc.position.x = Math.sin(t * 4) * 0.3;
+                hc.position.z = Math.cos(t * 4) * 0.3;
+            }
+            if(hm) {
+                hm.position.x = Math.sin(t * 4 + 2) * 0.3;
+                hm.position.z = Math.cos(t * 4 + 2) * 0.3;
+            }
         }
     },
     {
-        id: 'BOUNCE',    icon: '⚡', desc: 'Energy',
-        color: '#ff6600', speed: 4,
+        id: 'BOXING', icon: '🥊', desc: 'Combat',
+        color: '#ff3300',
         animate(av, t) {
-            const j = Math.pow(Math.abs(Math.sin(t * 6)), 0.5);
-            av.position.y = 0.25 + j * 0.5;
-            av.scale.y = 0.6 - j * 0.12;
-            av.scale.x = 0.6 + j * 0.12;
-            av.rotation.z = Math.sin(t * 5) * 0.12;
-            av.rotation.y += 0.015;
+            // Mouvements de poing (simulés par les halos)
+            const punch = Math.sin(t * 6) > 0.5 ? 1 : 0;
+            
+            // Déséquilibre du corps
+            av.rotation.z = punch * 0.3;
+            av.rotation.x = Math.sin(t * 5) * 0.2;
+            
+            // Sauts
+            av.position.y = 0.4 + Math.abs(Math.sin(t * 5)) * 0.4;
+            
+            // Les halos partent en avant comme des coups
+            const hc = av.getObjectByName('haloCyan');
+            const hm = av.getObjectByName('haloMag');
+            if(hc) {
+                hc.position.x = punch * 0.4;
+                hc.position.z = -0.15 - punch * 0.2;
+            }
+            if(hm) {
+                hm.position.x = -punch * 0.4;
+                hm.position.z = 0.15 + punch * 0.2;
+            }
+            
+            // Secousses
+            if(punch) {
+                av.position.x = (Math.random() - 0.5) * 0.1;
+            }
+        }
+    },
+    {
+        id: 'FLOAT', icon: '☁️', desc: 'Apesanteur',
+        color: '#88ccff',
+        animate(av, t) {
+            // Mouvement de flottaison très lent
+            av.position.y = 0.7 + Math.sin(t * 1.2) * 0.2;
+            av.position.x = Math.cos(t * 0.8) * 0.15;
+            av.position.z = Math.sin(t * 0.5) * 0.1;
+            
+            // Rotation très lente
+            av.rotation.y += 0.002;
+            av.rotation.x = Math.sin(t * 0.3) * 0.1;
+            
+            // Échelle qui "respire" doucement
+            const breath = 0.5 + Math.sin(t * 1.5) * 0.1;
+            av.scale.set(breath, breath * 1.1, breath);
+            
+            // Particules en mouvement orbital lent
+            if(particles) {
+                particles.rotation.y += 0.001;
+                particles.material.opacity = 0.3 + Math.sin(t * 0.5) * 0.2;
+            }
+            
+            // Opacité qui varie (effet gazeux)
+            av.traverse(c => {
+                if(c.isSprite && c.name !== 'main') {
+                    c.material.opacity = 0.2 + Math.sin(t) * 0.15;
+                }
+            });
+        }
+    },
+    {
+        id: 'EARTHQUAKE', icon: '📳', desc: 'Tremblement',
+        color: '#aa6600',
+        animate(av, t) {
+            // Tremblement violent
+            av.position.x = (Math.random() - 0.5) * 0.3;
+            av.position.y = 0.5 + (Math.random() - 0.5) * 0.2;
+            av.position.z = (Math.random() - 0.5) * 0.15;
+            
+            // Rotation chaotique
+            av.rotation.x = (Math.random() - 0.5) * 0.5;
+            av.rotation.y = (Math.random() - 0.5) * 0.5;
+            av.rotation.z = (Math.random() - 0.5) * 0.5;
+            
+            // Échelle qui vibre
+            const shake = 0.55 + (Math.random() - 0.5) * 0.15;
+            av.scale.set(shake, shake, shake);
+            
+            // Effet de "cassure" sur les cadres
+            const frame = av.getObjectByName('frame');
+            const frame2 = av.getObjectByName('frame2');
+            if(frame) frame.visible = Math.random() > 0.3;
+            if(frame2) frame2.visible = Math.random() > 0.3;
+            
+            // Particules en chaos
+            if(particles) {
+                particles.rotation.x += 0.03;
+                particles.rotation.y += 0.04;
+                particles.rotation.z += 0.02;
+            }
         }
     }
 ];
-
 // ---------------------------------------------------------------
 //  STATE
 // ---------------------------------------------------------------
@@ -942,41 +1097,360 @@ async function init() {
 // ---------------------------------------------------------------
 //  ANIMATION LOOP
 // ---------------------------------------------------------------
+// ================================================================
+// EFFETS SPÉCIAUX - Version Ultra-Distincte
+// Chaque effet transforme radicalement l'apparence de la mascotte
+// ================================================================
 const EFFECTS = [
-    // Effect 0: normal
-    (t) => {},
-    // Effect 1: glitch shift
+    // [0] NORMAL - État de base (aucun effet)
     (t) => {
         if(!avatar) return;
+        
+        // Reset complet de tous les effets
+        // Reset des positions
         const hc = avatar.getObjectByName('haloCyan');
         const hm = avatar.getObjectByName('haloMag');
-        if(hc) hc.position.x = Math.sin(t*20)*0.05;
-        if(hm) hm.position.x = -Math.sin(t*20)*0.05;
-    },
-    // Effect 2: color cycle
-    (t) => {
-        if(!avatar) return;
+        const main = avatar.getObjectByName('main');
+        if(hc) { hc.position.set(0, 0.6, -0.15); hc.material.opacity = 0.25; hc.scale.set(1.1, 1.4, 1); }
+        if(hm) { hm.position.set(0.05, 0.6, 0.15); hm.material.opacity = 0.15; hm.scale.set(1.05, 1.3, 1); }
+        
+        // Reset de l'échelle
+        avatar.scale.setScalar(0.55);
+        
+        // Reset des couleurs
         avatar.traverse(c => {
-            if(c.isLine) c.material.color.setHSL((t*0.3) % 1, 1, 0.5);
+            if(c.isLine) {
+                if(c.name === 'frame') c.material.color.setHex(0x00f5ff);
+                if(c.name === 'frame2') c.material.color.setHex(0xff0080);
+                c.material.opacity = (c.name === 'frame') ? 0.6 : 0.35;
+            }
+            if(c.isSprite) {
+                if(c.name === 'haloCyan') c.material.color.setHex(0x00f5ff);
+                if(c.name === 'haloMag') c.material.color.setHex(0xff0080);
+            }
         });
-    },
-    // Effect 3: scale pulse
-    (t) => {
-        if(!avatar) return;
-        const pulse = 0.55 + Math.sin(t*4)*0.07;
-        avatar.scale.setScalar(pulse);
-    },
-    // Effect 4: scanlines animation
-    (t) => {
-        if(!avatar) return;
+        
+        // Reset des particules
+        if(particles) {
+            particles.rotation.set(0, 0, 0);
+            particles.material.size = 0.025;
+            particles.material.opacity = 1;
+        }
+        
+        // Reset des lignes de scan
         for(let i=0;i<4;i++) {
             const s = avatar.getObjectByName(`scan${i}`);
             if(s) {
-                s.position.y = ((t * 0.8 + i * 0.25) % 1.4) - 0.1;
-                s.material.opacity = 0.3 + Math.sin(t*8+i)*0.2;
+                s.position.set(0, i * 0.35 + 0.1, 0.01);
+                s.material.opacity = 0.4;
+                s.scale.set(1, 1, 1);
             }
         }
+        
+        // Reset du fond
+        document.body.style.backgroundColor = '';
+        document.getElementById('scanLine').style.opacity = '0.4';
+    },
+    
+    // [1] GLITCH CATASTROPHIQUE - Effet de distortion numérique violente
+    (t) => {
+        if(!avatar) return;
+        
+        // Mouvement saccadé et aléatoire
+        const glitchX = (Math.random() - 0.5) * 0.2;
+        const glitchY = (Math.random() - 0.5) * 0.15;
+        avatar.position.x = glitchX;
+        avatar.position.y = 0.6 + glitchY;
+        
+        // Effet de "split RGB" (aberration chromatique extrême)
+        const hc = avatar.getObjectByName('haloCyan');
+        const hm = avatar.getObjectByName('haloMag');
+        const main = avatar.getObjectByName('main');
+        
+        if(hc) hc.position.set(glitchX + 0.1, 0.6 + glitchY, -0.15);
+        if(hm) hm.position.set(glitchX - 0.08, 0.6 + glitchY + 0.05, 0.15);
+        if(main) main.position.set(glitchX, 0.6 + glitchY, 0);
+        
+        // Lignes qui disparaissent/réapparaissent
+        avatar.traverse(c => {
+            if(c.isLine) {
+                c.visible = Math.random() > 0.3;
+                if(c.visible) c.material.opacity = 0.3 + Math.random() * 0.7;
+            }
+        });
+        
+        // Sauts d'échelle aléatoires
+        if(Math.random() > 0.97) {
+            avatar.scale.setScalar(0.3 + Math.random() * 0.5);
+        }
+        
+        // Effet de "scanline" qui clignote
+        document.getElementById('scanLine').style.opacity = 0.8 + Math.random() * 0.2;
+    },
+    
+    // [2] FEU ARTIFICIEL - Explosions de couleurs et particules
+    (t) => {
+        if(!avatar) return;
+        
+        // Pulsation explosive
+        const explosion = 0.4 + Math.abs(Math.sin(t * 8)) * 0.3;
+        avatar.scale.setScalar(explosion);
+        
+        // Changement de couleur rapide
+        const hue = (t * 0.5) % 1;
+        const main = avatar.getObjectByName('main');
+        if(main) main.material.color.setHSL(hue, 1, 0.5);
+        
+        // Particules qui tournent vite et changent de taille
+        if(particles) {
+            particles.rotation.y += 0.03;
+            particles.rotation.x += 0.01;
+            particles.material.size = 0.04 + Math.sin(t*10) * 0.02;
+        }
+        
+        // Anneau qui pulse violemment
+        const ring = avatar.getObjectByName('ring');
+        if(ring) {
+            ring.scale.setScalar(1 + Math.sin(t*6) * 0.3);
+            ring.material.opacity = 0.7 + Math.sin(t*8) * 0.3;
+        }
+        
+        // Explosion de couleurs sur les halos
+        const hc = avatar.getObjectByName('haloCyan');
+        const hm = avatar.getObjectByName('haloMag');
+        if(hc) hc.material.color.setHSL((t*0.3) % 1, 1, 0.6);
+        if(hm) hm.material.color.setHSL((t*0.3 + 0.5) % 1, 1, 0.6);
+    },
+    
+    // [3] RALENTI COSMIQUE - Mouvement de fluide/liquide
+    (t) => {
+        if(!avatar) return;
+        
+        // Mouvement ondulatoire lent et fluide
+        const wave1 = Math.sin(t * 1.5) * 0.15;
+        const wave2 = Math.cos(t * 1.2) * 0.15;
+        avatar.position.y = 0.6 + wave1 * 0.3;
+        avatar.position.x = wave2 * 0.2;
+        
+        // Rotation très lente
+        avatar.rotation.y += 0.002;
+        avatar.rotation.z = Math.sin(t * 0.8) * 0.1;
+        
+        // Échelle qui ondule comme une méduse
+        const scale = 0.5 + Math.sin(t * 0.7) * 0.1;
+        avatar.scale.set(scale, scale * 1.2, scale);
+        
+        // Opacité qui varie comme de l'eau
+        avatar.traverse(c => {
+            if(c.isSprite) {
+                c.material.opacity = 0.2 + Math.sin(t * 0.5) * 0.2;
+            }
+        });
+        
+        // Particules lentes et hypnotiques
+        if(particles) {
+            particles.rotation.y += 0.002;
+            particles.material.opacity = 0.3 + Math.sin(t * 0.3) * 0.2;
+        }
+        
+        // Fond qui pulse doucement
+        const bgHue = (t * 0.05) % 1;
+        document.body.style.backgroundColor = `hsl(${bgHue * 360}, 50%, 5%)`;
+    },
+    
+    // [4] SCAN 3D - Effet de numérisation/laser
+    (t) => {
+        if(!avatar) return;
+        
+        // Animation intense des lignes de scan
+        for(let i=0;i<4;i++) {
+            const s = avatar.getObjectByName(`scan${i}`);
+            if(s) {
+                // Les lignes montent et descendent rapidement
+                s.position.y = ((t * 2 + i * 0.5) % 2) - 0.5;
+                // Elles s'allongent et rétrécissent
+                s.scale.x = 1.5 + Math.sin(t*5 + i) * 0.8;
+                s.material.opacity = 0.8 + Math.sin(t*10 + i) * 0.2;
+                s.material.color.setHSL((t*0.2 + i*0.1) % 1, 1, 0.5);
+            }
+        }
+        
+        // Effet de "laser" sur les cadres
+        const frame = avatar.getObjectByName('frame');
+        const frame2 = avatar.getObjectByName('frame2');
+        if(frame) {
+            frame.material.color.setHSL((t*0.3) % 1, 1, 0.5);
+            frame.scale.set(1 + Math.sin(t*3)*0.1, 1 + Math.cos(t*2)*0.1, 1);
+        }
+        if(frame2) {
+            frame2.material.color.setHSL((t*0.3 + 0.3) % 1, 1, 0.5);
+            frame2.scale.set(1 + Math.cos(t*2)*0.1, 1 + Math.sin(t*3)*0.1, 1);
+        }
+        
+        // La scanline principale est très active
+        document.getElementById('scanLine').style.opacity = 0.8;
+    },
+    
+    // [5] INVERSION NÉGATIVE - Effet de photo négative
+    (t) => {
+        if(!avatar) return;
+        
+        // Inversion des couleurs sur tous les éléments
+        avatar.traverse(c => {
+            if(c.material && c.material.color) {
+                // Inversion RGB simplifiée
+                const r = 1 - c.material.color.r;
+                const g = 1 - c.material.color.g;
+                const b = 1 - c.material.color.b;
+                c.material.color.setRGB(r, g, b);
+            }
+        });
+        
+        // Effet de "halo inversé" - les halos deviennent sombres
+        const hc = avatar.getObjectByName('haloCyan');
+        const hm = avatar.getObjectByName('haloMag');
+        if(hc) { hc.material.color.setHex(0x000000); hc.material.opacity = 0.8; }
+        if(hm) { hm.material.color.setHex(0xffffff); hm.material.opacity = 0.8; }
+        
+        // Contraste élevé
+        if(particles) {
+            particles.material.color.setHex(0xffffff);
+            particles.material.size = 0.03;
+        }
+        
+        // Fond qui s'inverse aussi
+        const invertHue = (t * 0.1) % 1;
+        document.body.style.backgroundColor = `hsl(${invertHue * 360}, 80%, 20%)`;
+    },
+    
+    // [6] TOURBILLON QUANTIQUE - Rotation différentielle de toutes les parties
+    (t) => {
+        if(!avatar) return;
+        
+        // Chaque partie tourne à sa propre vitesse
+        const frame = avatar.getObjectByName('frame');
+        const frame2 = avatar.getObjectByName('frame2');
+        const ring = avatar.getObjectByName('ring');
+        const particles = avatar.getObjectByName('particles');
+        const main = avatar.getObjectByName('main');
+        
+        if(frame) frame.rotation.y += 0.03;
+        if(frame2) frame2.rotation.y -= 0.05;
+        if(ring) ring.rotation.y += 0.02;
+        if(particles) {
+            particles.rotation.y += 0.01;
+            particles.rotation.x += 0.005;
+        }
+        
+        // Le sprite principal reste fixe mais les halos tournent autour
+        const hc = avatar.getObjectByName('haloCyan');
+        const hm = avatar.getObjectByName('haloMag');
+        if(hc) {
+            hc.position.x = Math.sin(t * 2) * 0.3;
+            hc.position.z = Math.cos(t * 2) * 0.3;
+        }
+        if(hm) {
+            hm.position.x = Math.sin(t * 2 + 2) * 0.3;
+            hm.position.z = Math.cos(t * 2 + 2) * 0.3;
+        }
+        
+        // L'anneau se déforme
+        if(ring) {
+            ring.scale.set(1 + Math.sin(t*3)*0.2, 1 + Math.cos(t*4)*0.2, 1);
+        }
+    },
+    
+    // [7] CLIGNOTEMENT STROBOSCOPIQUE - Effet disco/party
+    (t) => {
+        if(!avatar) return;
+        
+        // Clignotement très rapide (stroboscope)
+        const blink = Math.sin(t * 30) > 0 ? 1 : 0.1;
+        
+        // Tout clignote
+        avatar.traverse(c => {
+            if(c.isSprite || c.isLine) {
+                c.material.opacity = blink;
+            }
+        });
+        
+        // Rotation rapide sur tous les axes
+        avatar.rotation.x += 0.02;
+        avatar.rotation.y += 0.03;
+        avatar.rotation.z += 0.01;
+        
+        // Échelle qui varie très vite
+        const scale = 0.4 + Math.abs(Math.sin(t * 15)) * 0.3;
+        avatar.scale.setScalar(scale);
+        
+        // Couleurs qui changent à chaque frame
+        const r = Math.sin(t * 10) * 0.5 + 0.5;
+        const g = Math.sin(t * 10 + 2) * 0.5 + 0.5;
+        const b = Math.sin(t * 10 + 4) * 0.5 + 0.5;
+        
+        avatar.traverse(c => {
+            if(c.isLine) {
+                c.material.color.setRGB(r, g, b);
+            }
+        });
+        
+        // Fond qui flash
+        if(Math.sin(t * 20) > 0.8) {
+            document.body.style.backgroundColor = '#ff00ff20';
+        } else if(Math.sin(t * 20) < -0.8) {
+            document.body.style.backgroundColor = '#00ffff20';
+        }
+    },
+    
+    // [8] DISSOLUTION - Effet de fantôme/disparition
+    (t) => {
+        if(!avatar) return;
+        
+        // Opacité qui diminue et augmente
+        const ghost = 0.3 + Math.sin(t * 2) * 0.3;
+        
+        avatar.traverse(c => {
+            if(c.isSprite) {
+                c.material.opacity = ghost * 0.5;
+            }
+            if(c.isLine) {
+                c.material.opacity = ghost;
+            }
+        });
+        
+        // Particules qui s'éparpillent
+        if(particles) {
+            particles.rotation.y += 0.01;
+            particles.material.opacity = ghost * 0.3;
+            particles.scale.set(1 + Math.sin(t)*0.5, 1 + Math.cos(t)*0.5, 1);
+        }
+        
+        // Mouvement flottant
+        avatar.position.y = 0.6 + Math.sin(t * 1.5) * 0.2;
+        avatar.position.x = Math.cos(t * 1.2) * 0.1;
+        
+        // Dédoublement (simulé par le halo qui s'éloigne)
+        const hc = avatar.getObjectByName('haloCyan');
+        const hm = avatar.getObjectByName('haloMag');
+        if(hc) hc.position.z = -0.3 + Math.sin(t) * 0.2;
+        if(hm) hm.position.z = 0.3 + Math.cos(t) * 0.2;
+        
+        // Fond qui devient brumeux
+        document.body.style.backgroundColor = `rgba(2,8,16,${0.5 + Math.sin(t)*0.3})`;
     }
+];
+
+// Mettre à jour les labels (beaucoup plus descriptifs)
+const EFFECT_LABELS = [
+    'NORMAL',
+    'GLITCH CATA',
+    'FEU ARTIFICE',
+    'COSMIQUE',
+    'SCAN 3D',
+    'NÉGATIF',
+    'TOURBILLON',
+    'STROBO',
+    'FANTÔME'
 ];
 
 renderer.setAnimationLoop((now) => {
@@ -1215,26 +1689,6 @@ document.getElementById('btnEffect').addEventListener('click', (e) => {
     burst(e.clientX, e.clientY, 12);
 });
 
-// ---------------------------------------------------------------
-//  SHARE (Web Share API)
-// ---------------------------------------------------------------
-document.getElementById('btnShare').addEventListener('click', async (e) => {
-    burst(e.clientX, e.clientY, 8);
-    try {
-        if(navigator.share) {
-            await navigator.share({
-                title: 'EKO AR — Mascotte 3D',
-                text: '🚀 Découvrez la mascotte EKO en réalité augmentée !',
-                url: window.location.href
-            });
-        } else {
-            await navigator.clipboard.writeText(window.location.href);
-            showToast('🔗 LIEN COPIÉ !', 'success');
-        }
-    } catch(err) {
-        showToast('🔗 ' + window.location.href.substring(0,30), 'success');
-    }
-});
 
 // ---------------------------------------------------------------
 //  UTILS
@@ -1265,7 +1719,7 @@ function burst(x, y, n = 14) {
 }
 
 function enableButtons(on) {
-    ['btnAnim','btnPhoto','btnVideo','btnEffect','btnShare'].forEach(id =>
+    ['btnAnim','btnPhoto','btnVideo','btnEffect'].forEach(id =>
         document.getElementById(id).disabled = !on
     );
 }
