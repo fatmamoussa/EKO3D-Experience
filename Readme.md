@@ -109,4 +109,5 @@ Caméra → WebRTC → Video Element
 **"Accès caméra refusé"** → Utiliser HTTPS, autoriser caméra dans le navigateur  
 **"Mascotte ne s'affiche pas"** → Vérifier que `mascotte.png` est dans le dossier  
 **Lag/performance** → Réduire la résolution ou utiliser un appareil plus récent
-
+## Demonstration
+Video disponible dans les Issues
